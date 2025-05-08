@@ -1,3 +1,7 @@
+function $(id) {
+    return document.getElementById(id)
+}
+
 const gameboard = (function () {
     let board = [["~", "~", "~",], 
                  ["~", "~", "~"], 
@@ -60,17 +64,21 @@ const gameboard = (function () {
             for (let j = 0; j <3; j++) {
                 if (board[i][j] != "~") {
                     emptySpace--;
-                    console.log(emptySpace);
                 }
                 if (emptySpace === 0) {
                     alert("its a draw!")
                 }
             }
         }
-
     }
 
-    return {display, place, checkWin, checkDraw};
+    function reset() {
+        board = [["~", "~", "~",], 
+                 ["~", "~", "~"], 
+                 ["~", "~", "~"]];
+    }
+
+    return {display, place, checkWin, checkDraw, reset};
 })();
 
 
@@ -82,7 +90,6 @@ function Player (n, m) {
         let row = prompt("Enter row:");
         let column = prompt("Enter column:");
         gameboard.place(row - 1, column - 1, marker);
-        gameboard.display();;
     }
 
     return {name, move};
@@ -94,6 +101,12 @@ function Game () {
 }
 
 function displayController () {
+    let player1 = Player("Player 1", "X")
+    let player2 = Player("Player 2", "O")
 
+    function displayBoard() {
+        
+    }
+
+    return {displayBoard}
 }
-

@@ -1,3 +1,40 @@
-* {
-    background-color: salmon;
+body {
+    height: 100%;
+    background-color: rgb(126, 163, 177);
+    font-family: 'Fredoka', sans-serif;
+}
+
+h1 {
+    display: flex;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    padding-top: 55px;
+    font-size: 3em;
+}
+
+#gameboardDiv {
+    display: grid;
+    justify-content: center;
+    grid-template-rows: 150px 150px 150px;
+    grid-template-columns: 150px 150px 150px;
+    grid-gap: 20px;
+    padding-top: 50px;
+}
+
+#gameboardDiv > * {
+    cursor: pointer;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #AAA;
+    border-radius: 10px;
+    box-shadow: -7px 7px rgb(97, 120, 129);
+    text-transform: uppercase;
+    transition-duration: 300ms;
+}
+
+#gameboardDiv > *:hover {
+    transition-duration: 300ms;
+    transform: translateY(5px);
 }
