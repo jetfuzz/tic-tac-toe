@@ -5,7 +5,7 @@ function $(id) {
 document.addEventListener("DOMContentLoaded", () => {
     displayController.displayBoard();
     displayController.handleClickEvents();
-    displayController.resetBtn();
+    displayController.handleResetEvent();
 })
 
 const gameboard = (function () {
@@ -34,9 +34,8 @@ const gameboard = (function () {
         if (board[row][column] === " ") {
             board[row][column] = value;  
         }
-        displayConsole();
-        checkWin();
         checkDraw();
+        checkWin();
     }
 
     function checkWin () {
@@ -46,11 +45,10 @@ const gameboard = (function () {
                 rowSum += board[i][j];
             }
             if (rowSum === "XXX") {
-                //add alerts to resultPara instead
-                alert("player 1 wins!");
+                displayController.addResultText("Player 1 wins!");
                 Game.gameOver();
             } else if (rowSum === "OOO") {
-                alert("player 2 wins!");
+                displayController.addResultText("Player 2 wins!");
                 Game.gameOver();
             }
         }
@@ -60,25 +58,25 @@ const gameboard = (function () {
                 colSum += board[j][i];
             }
             if (colSum === "XXX") {
-                alert("player 1 wins!");
+                displayController.addResultText("Player 1 wins!");
                 Game.gameOver();
             } else if (colSum === "OOO") {
-                alert("player 2 wins!");
+                displayController.addResultText("Player 2 wins!");
                 Game.gameOver();
             }
         }
         if (board[0][0] === "X" && board[1][1] === "X" && board[2][2] === "X") {
-            alert("player 1 wins!");
+            displayController.addResultText("Player 1 wins!");
             Game.gameOver();
         } else if (board[0][0] === "O" && board[1][1] === "O" && board[2][2] === "O") {
-            alert("player 2 wins!");
+            displayController.addResultText("Player 2 wins!");
             Game.gameOver();
         }
         if (board[2][0] === "X" && board[1][1] === "X" && board[0][2] === "X") {
-            alert("player 1 wins!");
+            displayController.addResultText("Player 1 wins!");
             Game.gameOver();
         } else if (board[2][0] === "O" && board[1][1] === "O" && board[0][2] === "O") {
-            alert("player 2 wins!");
+            displayController.addResultText("Player 2 wins!");
             Game.gameOver();
         }
     }
@@ -93,7 +91,7 @@ const gameboard = (function () {
             }
         }
         if (emptySpace === 0) {
-            alert("it's a draw!");
+            displayController.addResultText("It's a draw!");
             Game.gameOver();
         }
     }
@@ -122,7 +120,6 @@ const Game = (function() {
     let p1 = Player("player 1", "X");
     let p2 = Player("player 2", "O");
     let currentPlayer = 1;
-    //let winner = ""
 
     function handleTurn() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
@@ -142,6 +139,7 @@ const Game = (function() {
         displayController.displayBoard();
         displayController.enableClicks();
         displayController.handleClickEvents();
+        displayController.addResultText("");
     }
 
     return {p1, p2, handleTurn, getCurrentPlayer, gameOver, resetGame}
@@ -179,15 +177,17 @@ const displayController = (function() {
         for (let i = 0; i < cell.length; i++) {
             cell[i].addEventListener("click", function () {
                 const {row, column} = toCoordinates(i)
-                if (Game.getCurrentPlayer() === 1) {
+                if (cell[i].innerHTML != " ") {
+                    cell[i].style.pointerEvents = "none" 
+                } else if (Game.getCurrentPlayer() === 1 && cell[i].innerHTML === " ") {
                     Game.p1.move(row, column);
                     this.innerHTML = "X";
-                    this.style.color = "#FFD166";
+                    this.style.color = "mediumSlateBlue";
                     Game.handleTurn();
-                } else {
+                } else if (Game.getCurrentPlayer() === 2 && cell[i].innerHTML === " ") {
                     Game.p2.move(row, column);  
                     this.innerHTML = "O";
-                    this.style.color = "#FF6B6B";
+                    this.style.color = "HotPink";
                     Game.handleTurn();
                 }
             })
@@ -206,16 +206,21 @@ const displayController = (function() {
         }
     }
 
-    function resetBtn() {
+    function handleResetEvent() {
         $("resetBtn").addEventListener("click", function () {
             Game.resetGame();
         })
+    }
+
+    function addResultText(result) {
+        $("resultPara").innerHTML = result;
     }
 
     return {displayBoard,
             handleClickEvents,
             disableClicks,
             enableClicks,
-            resetBtn
+            handleResetEvent,
+            addResultText
         }
 })();
