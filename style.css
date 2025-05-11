@@ -27,11 +27,12 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #AAA;
     border-radius: 10px;
     box-shadow: -7px 7px rgb(97, 120, 129);
     text-transform: uppercase;
     transition-duration: 300ms;
+    font-size: 6em;
+    font-weight: 700;
 }
 
 #gameboardDiv > *:hover {
