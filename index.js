@@ -1,7 +1,3 @@
-function $(id) {
-    return document.getElementById(id)
-}
-
 document.addEventListener("DOMContentLoaded", () => {
     displayController.displayBoard();
     displayController.handleClickEvents();
@@ -39,16 +35,17 @@ const gameboard = (function () {
     }
 
     function checkWin () {
+        //recode function to avoid repetitive calls
         for (let i = 0; i < 3; i++) {
             let rowSum = "";
             for (let j = 0; j < 3; j++) {
                 rowSum += board[i][j];
             }
             if (rowSum === "XXX") {
-                displayController.addResultText("Player 1 wins!");
+                displayController.addResultText(`${Game.p1.getName()} wins!`);
                 Game.gameOver();
             } else if (rowSum === "OOO") {
-                displayController.addResultText("Player 2 wins!");
+                displayController.addResultText(`${Game.p2.getName()} wins!`);
                 Game.gameOver();
             }
         }
@@ -58,25 +55,25 @@ const gameboard = (function () {
                 colSum += board[j][i];
             }
             if (colSum === "XXX") {
-                displayController.addResultText("Player 1 wins!");
+                displayController.addResultText(`${Game.p1.getName()} wins!`);
                 Game.gameOver();
             } else if (colSum === "OOO") {
-                displayController.addResultText("Player 2 wins!");
+                displayController.addResultText(`${Game.p2.getName()} wins!`);
                 Game.gameOver();
             }
         }
         if (board[0][0] === "X" && board[1][1] === "X" && board[2][2] === "X") {
-            displayController.addResultText("Player 1 wins!");
+            displayController.addResultText(`${Game.p1.getName()} wins!`);
             Game.gameOver();
         } else if (board[0][0] === "O" && board[1][1] === "O" && board[2][2] === "O") {
-            displayController.addResultText("Player 2 wins!");
+            displayController.addResultText(`${Game.p2.getName()} wins!`);
             Game.gameOver();
         }
         if (board[2][0] === "X" && board[1][1] === "X" && board[0][2] === "X") {
-            displayController.addResultText("Player 1 wins!");
+            displayController.addResultText(`${Game.p1.getName()} wins!`);
             Game.gameOver();
         } else if (board[2][0] === "O" && board[1][1] === "O" && board[0][2] === "O") {
-            displayController.addResultText("Player 2 wins!");
+            displayController.addResultText(`${Game.p2.getName()} wins!`);
             Game.gameOver();
         }
     }
@@ -102,7 +99,14 @@ const gameboard = (function () {
                  [" ", " ", " "]];
     }
 
-    return {displayConsole, place, checkWin, checkDraw, reset, getBoard};
+    return {
+        displayConsole,
+        place,
+        checkWin,
+        checkDraw,
+        reset,
+        getBoard
+    };
 })();
 
 function Player (n, m) {
@@ -113,15 +117,19 @@ function Player (n, m) {
         gameboard.place(row, column, marker);
     }
 
-    return {move};
+    function getName() {
+        return name;
+    }
+
+    return {move, getName};
 }
 
 const Game = (function() {
-    let p1 = Player("player 1", "X");
-    let p2 = Player("player 2", "O");
+    let p1 = Player("Player 1", "X");
+    let p2 = Player("Player 2", "O");
     let currentPlayer = 1;
 
-    function handleTurn() {
+    function switchPlayerTurn() {
         currentPlayer = currentPlayer === 1 ? 2 : 1;
         return currentPlayer;
     }
@@ -142,17 +150,24 @@ const Game = (function() {
         displayController.addResultText("");
     }
 
-    return {p1, p2, handleTurn, getCurrentPlayer, gameOver, resetGame}
+    return {
+        p1,
+        p2,
+        switchPlayerTurn,
+        getCurrentPlayer,
+        gameOver,
+        resetGame
+    };
 })();
 
 const displayController = (function() {
-    const gameboardDiv = $("gameboardDiv"); 
+    const gameboardDiv = document.getElementById("gameboardDiv"); 
     const board = gameboard.getBoard();
     const cell = gameboardDiv.children;
 
     function removeAllChildNodes(parent) {
         while (parent.firstChild) {
-            parent.removeChild(parent.firstChild)
+            parent.removeChild(parent.firstChild);
         }
     }
 
@@ -160,16 +175,16 @@ const displayController = (function() {
         return {
             row: Math.floor(index / 3),
             column: index % 3
-        }
+        };
     }
 
     function displayBoard() {
         removeAllChildNodes(gameboardDiv);
         for (let i of board) {
-            let div = document.createElement("div");
+            let button = document.createElement("button");
             let text = document.createTextNode(i);
-            div.appendChild(text)
-            gameboardDiv.appendChild(div)
+            button.appendChild(text);
+            gameboardDiv.appendChild(button);
         }
     }
 
@@ -178,17 +193,17 @@ const displayController = (function() {
             cell[i].addEventListener("click", function () {
                 const {row, column} = toCoordinates(i)
                 if (cell[i].innerHTML != " ") {
-                    cell[i].style.pointerEvents = "none" 
-                } else if (Game.getCurrentPlayer() === 1 && cell[i].innerHTML === " ") {
+                    cell[i].style.pointerEvents = "none";
+                } else if (Game.getCurrentPlayer() === 1) {
                     Game.p1.move(row, column);
                     this.innerHTML = "X";
                     this.style.color = "mediumSlateBlue";
-                    Game.handleTurn();
-                } else if (Game.getCurrentPlayer() === 2 && cell[i].innerHTML === " ") {
+                    Game.switchPlayerTurn();
+                } else if (Game.getCurrentPlayer() === 2) {
                     Game.p2.move(row, column);  
                     this.innerHTML = "O";
                     this.style.color = "HotPink";
-                    Game.handleTurn();
+                    Game.switchPlayerTurn();
                 }
             })
         }
@@ -196,7 +211,7 @@ const displayController = (function() {
 
     function disableClicks() {
         for (let i = 0; i < cell.length; i++) {
-            cell[i].style.pointerEvents = "none" 
+            cell[i].style.pointerEvents = "none";
         }
     }
 
@@ -207,20 +222,21 @@ const displayController = (function() {
     }
 
     function handleResetEvent() {
-        $("resetBtn").addEventListener("click", function () {
+        document.getElementById("resetBtn").addEventListener("click", function () {
             Game.resetGame();
         })
     }
 
     function addResultText(result) {
-        $("resultPara").innerHTML = result;
+        document.getElementById("resultPara").innerHTML = result;
     }
 
-    return {displayBoard,
-            handleClickEvents,
-            disableClicks,
-            enableClicks,
-            handleResetEvent,
-            addResultText
-        }
+    return {
+        displayBoard,
+        handleClickEvents,
+        disableClicks,
+        enableClicks,
+        handleResetEvent,
+        addResultText
+    };
 })();

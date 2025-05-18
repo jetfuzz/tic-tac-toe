@@ -34,6 +34,7 @@ h1 {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
+    border: none;
     box-shadow: -7px 7px #4A4D77;
     text-transform: uppercase;
     transition-duration: 300ms;
